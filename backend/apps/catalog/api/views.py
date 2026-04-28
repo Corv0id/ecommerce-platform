@@ -13,10 +13,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.prefetch_related("variants__inventory", "images").select_related("category").filter(status=Product.Status.PUBLISHED)
     serializer_class = ProductSerializer
     permission_classes = [IsMerchantOrReadOnly]
     lookup_field = "slug"
+
+    def get_queryset(self):
+        queryset = Product.objects.prefetch_related("variants__inventory", "images").select_related("category").filter(status=Product.Status.PUBLISHED)
+        category_slug = self.request.query_params.get('category', None)
+        if category_slug and category_slug.lower() != 'all':
+            try:
+                category = Category.objects.get(slug=category_slug)
+                # Include products in this category AND all its descendants
+                categories_to_include = [category.id]
+                descendants = category.subcategories.all()
+                for desc in descendants:
+                    categories_to_include.append(desc.id)
+                queryset = queryset.filter(category_id__in=categories_to_include)
+            except Category.DoesNotExist:
+                pass
+        return queryset
 
     @action(detail=False, methods=['get'])
     def smart_search(self, request):

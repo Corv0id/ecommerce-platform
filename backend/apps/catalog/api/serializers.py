@@ -9,7 +9,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ["id", "url", "sort_order"]
+        fields = ["id", "url", "is_primary", "sort_order"]
 
 class InventoryLevelSerializer(serializers.ModelSerializer):
     class Meta:

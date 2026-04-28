@@ -43,3 +43,28 @@ class LoginView(TokenObtainPairView):
 
 class RefreshView(TokenRefreshView):
     permission_classes = [AllowAny]
+
+from rest_framework import viewsets
+from apps.accounts.models import Address
+from apps.catalog.models import Wishlist
+from apps.accounts.api.serializers import AddressSerializer, WishlistSerializer
+
+class AddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = WishlistSerializer
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user).select_related('product')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

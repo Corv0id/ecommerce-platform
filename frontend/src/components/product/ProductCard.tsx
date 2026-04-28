@@ -11,11 +11,14 @@ export interface Product {
     name: string;
     slug: string;
   };
-  images: { image_url: string; alt_text: string; is_primary: boolean }[];
+  images: { url: string; is_primary: boolean; sort_order?: number }[];
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const primaryImage = product.images?.find((img) => img.is_primary)?.image_url || "/placeholder.jpg";
+  // Try to find primary image, fallback to first image, then placeholder
+  const primaryImage = product.images?.find((img) => img.is_primary)?.url 
+    || product.images?.[0]?.url 
+    || "/placeholder.jpg";
 
   return (
     <Link href={`/products/${product.slug}`} className="group flex flex-col h-full">

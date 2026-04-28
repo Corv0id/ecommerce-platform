@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -42,6 +43,7 @@ class ProductVariant(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     url = models.URLField(max_length=500)
+    is_primary = models.BooleanField(default=False)
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -58,3 +60,14 @@ class InventoryLevel(models.Model):
 
     def __str__(self):
         return f"{self.variant.sku} Inventory"
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wishlist")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="wishlisted_by")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+    def __str__(self):
+        return f"{self.user.email} - {self.product.name}"

@@ -3,14 +3,20 @@ import { SlidersHorizontal, ChevronDown, X } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function getProducts(searchQuery: string | null = null) {
+async function getProducts(searchQuery: string | null = null, categoryQuery: string | null = null) {
   try {
-    let url = "http://127.0.0.1:8000/api/v1/catalog/products/";
+    let url = new URL("http://127.0.0.1:8000/api/v1/catalog/products/");
+    
     if (searchQuery) {
-      url = `http://127.0.0.1:8000/api/v1/catalog/products/smart_search/?q=${encodeURIComponent(searchQuery)}`;
+      url = new URL("http://127.0.0.1:8000/api/v1/catalog/products/smart_search/");
+      url.searchParams.append('q', searchQuery);
     }
     
-    const res = await fetch(url, { 
+    if (categoryQuery && categoryQuery !== 'all') {
+      url.searchParams.append('category', categoryQuery);
+    }
+    
+    const res = await fetch(url.toString(), { 
       next: { revalidate: 60 } // Revalidate every minute
     });
     if (!res.ok) throw new Error("Failed to fetch products");
@@ -29,14 +35,9 @@ export default async function ProductsPage({
 }) {
   const params = await searchParams;
   const searchFilter = typeof params.search === 'string' ? params.search.toLowerCase() : null;
-  
-  let products: Product[] = await getProducts(searchFilter);
-  
-  // Filter by category
   const categoryFilter = typeof params.category === 'string' ? params.category.toLowerCase() : null;
-  if (categoryFilter && categoryFilter !== 'all') {
-    products = products.filter(p => p.category?.slug.toLowerCase() === categoryFilter || p.category?.name.toLowerCase() === categoryFilter);
-  }
+  
+  let products: Product[] = await getProducts(searchFilter, categoryFilter);
 
   // If searchFilter is present, we already filtered via backend smart_search. No local filter needed.
 
