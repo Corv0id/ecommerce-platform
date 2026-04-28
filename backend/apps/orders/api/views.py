@@ -68,3 +68,14 @@ class CheckoutView(APIView):
             "client_secret": intent.client_secret,
             "provider_ref": intent.provider_ref
         }, status=status.HTTP_201_CREATED)
+
+from rest_framework import viewsets
+from apps.orders.api.serializers import OrderSerializer
+
+class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).prefetch_related('lines__variant__product')
+

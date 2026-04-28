@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, Star } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Truck, ShieldCheck, Star, Heart } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
 import { useParams } from "next/navigation";
 import { api } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -44,10 +46,13 @@ export default function ProductDetailPage() {
       name: product.name,
       price: parseFloat(product.base_price),
       quantity: 1,
-      imageUrl: product.images?.[0]?.image_url || "/placeholder.jpg",
+      imageUrl: product.images?.[0]?.url || "/placeholder.jpg",
       size: selectedSize || undefined,
     });
   };
+
+  const { toggleWishlist, user } = useAuthStore();
+  const isWishlisted = user?.wishlist?.some((item) => String(item.product) === String(product?.id));
 
   if (loading) {
     return <div className="py-24 text-center">Loading...</div>;
@@ -74,8 +79,14 @@ export default function ProductDetailPage() {
           <div className="aspect-[4/5] bg-secondary rounded-2xl overflow-hidden relative">
             <div 
               className="w-full h-full bg-cover bg-center"
-              style={{ backgroundImage: `url(${product.images?.[activeImage]?.image_url || "/placeholder.jpg"})` }}
+              style={{ backgroundImage: `url(${product.images?.[activeImage]?.url || "/placeholder.jpg"})` }}
             />
+            <button 
+              onClick={() => toggleWishlist(product.id)}
+              className="absolute top-6 right-6 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+            >
+              <Heart className={`w-6 h-6 ${isWishlisted ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+            </button>
           </div>
           {product.images && product.images.length > 1 && (
             <div className="flex gap-4 overflow-x-auto pb-2">
@@ -87,7 +98,7 @@ export default function ProductDetailPage() {
                 >
                   <div 
                     className="w-full h-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${img.image_url})` }}
+                    style={{ backgroundImage: `url(${img.url})` }}
                   />
                 </button>
               ))}
@@ -100,7 +111,7 @@ export default function ProductDetailPage() {
           <div className="mb-8">
             <h1 className="text-4xl font-bold tracking-tighter mb-2">{product.name}</h1>
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-2xl font-medium">{parseFloat(product.base_price).toFixed(2)} TND</span>
+              <span className="text-2xl font-medium">{formatCurrency(product.base_price)}</span>
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Star className="w-4 h-4 fill-brand-500 text-brand-500" />
                 <Star className="w-4 h-4 fill-brand-500 text-brand-500" />
@@ -229,11 +240,11 @@ function RelatedProducts({ categorySlug, currentProductId }: { categorySlug: str
           <div className="aspect-[4/5] bg-secondary rounded-2xl overflow-hidden mb-4">
             <div 
               className="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
-              style={{ backgroundImage: `url(${p.images?.[0]?.image_url || "/placeholder.jpg"})` }}
+              style={{ backgroundImage: `url(${p.images?.[0]?.url || "/placeholder.jpg"})` }}
             />
           </div>
           <h3 className="font-medium group-hover:text-brand-600 transition-colors truncate">{p.name}</h3>
-          <p className="text-muted-foreground">{parseFloat(p.base_price).toFixed(2)} TND</p>
+          <p className="text-muted-foreground">{formatCurrency(p.base_price)}</p>
         </Link>
       ))}
     </>

@@ -30,6 +30,7 @@ interface AuthState {
   setToken: (token: string) => void;
   fetchProfile: () => Promise<void>;
   updateUser: (data: Partial<User>) => void;
+  toggleWishlist: (productId: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -57,6 +58,27 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       updateUser: (data) => set((state) => ({ user: state.user ? { ...state.user, ...data } : null })),
+      toggleWishlist: async (productId: string) => {
+        const { user } = useAuthStore.getState();
+        if (!user) return;
+
+        const wishlistItem = user.wishlist?.find((item) => String(item.product) === String(productId));
+        try {
+          if (wishlistItem) {
+            await accountApi.removeFromWishlist(wishlistItem.id);
+          } else {
+            await accountApi.addToWishlist(productId);
+          }
+          // Refresh profile to get updated wishlist
+          const [profileRes, wishlistRes] = await Promise.all([
+            accountApi.getProfile(),
+            accountApi.getWishlist()
+          ]);
+          set({ user: { ...profileRes.data, wishlist: wishlistRes.data } });
+        } catch (error) {
+          console.error("Failed to toggle wishlist", error);
+        }
+      },
     }),
     {
       name: 'auth-storage',

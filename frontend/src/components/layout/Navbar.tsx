@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingBag, User, Search, Menu, X, ArrowRight } from "lucide-react";
+import { ShoppingBag, User, Search, Menu, X, ArrowRight, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import { catalogApi } from "@/lib/api";
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  parent: number | null;
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -18,12 +26,26 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
+  const [categories, setCategories] = useState<Category[]>([]);
+
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
+
+    // Fetch categories
+    const fetchCats = async () => {
+      try {
+        const res = await catalogApi.getCategories();
+        setCategories(res.data.results || res.data);
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+    fetchCats();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -37,6 +59,8 @@ export default function Navbar() {
       setSearchQuery("");
     }
   };
+
+  const parents = categories.filter(c => c.parent === null);
 
   return (
     <>
@@ -65,13 +89,34 @@ export default function Navbar() {
             <Link href="/products" className="hover:text-brand-500 transition-colors">
               Collections
             </Link>
-            <Link href="/products?category=women" className="hover:text-brand-500 transition-colors">
-              Women
-            </Link>
-            <Link href="/products?category=men" className="hover:text-brand-500 transition-colors">
-              Men
-            </Link>
-            <Link href="/about" className="hover:text-brand-500 transition-colors">
+            
+            {parents.map((parent) => (
+              <div key={parent.id} className="group relative">
+                <Link href={`/products?category=${parent.slug}`} className="flex items-center gap-1 hover:text-brand-500 transition-colors py-4">
+                  {parent.name} <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                </Link>
+                
+                {/* Dropdown */}
+                <div className="absolute top-full left-0 w-48 bg-background border border-border rounded-xl shadow-xl opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 z-50 overflow-hidden">
+                  <div className="py-2">
+                    {categories.filter(c => c.parent === parent.id).map(child => (
+                      <Link 
+                        key={child.id} 
+                        href={`/products?category=${child.slug}`}
+                        className="block px-4 py-2 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                    {categories.filter(c => c.parent === parent.id).length === 0 && (
+                      <div className="px-4 py-2 text-sm text-muted-foreground">Aucune sous-catégorie</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <Link href="/about" className="hover:text-brand-500 transition-colors py-4">
               About Us
             </Link>
           </nav>
@@ -128,12 +173,27 @@ export default function Navbar() {
               <Link href="/products" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between border-b border-border pb-4">
                 Collections <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
-              <Link href="/products?category=women" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between border-b border-border pb-4">
-                Women <ArrowRight className="w-4 h-4 text-muted-foreground" />
-              </Link>
-              <Link href="/products?category=men" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between border-b border-border pb-4">
-                Men <ArrowRight className="w-4 h-4 text-muted-foreground" />
-              </Link>
+              
+              {parents.map((parent) => (
+                <div key={parent.id} className="border-b border-border pb-4">
+                  <Link href={`/products?category=${parent.slug}`} onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between mb-3 text-brand-600">
+                    {parent.name} <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <div className="pl-4 flex flex-col gap-3 text-base text-muted-foreground">
+                    {categories.filter(c => c.parent === parent.id).map(child => (
+                      <Link 
+                        key={child.id} 
+                        href={`/products?category=${child.slug}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="hover:text-foreground transition-colors"
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
               <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-between border-b border-border pb-4">
                 About Us <ArrowRight className="w-4 h-4 text-muted-foreground" />
               </Link>
@@ -158,7 +218,7 @@ export default function Navbar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products, categories..."
+                placeholder="Rechercher des produits..."
                 className="w-full text-xl bg-background border-2 border-border focus:border-brand-500 rounded-2xl py-6 pl-14 pr-16 outline-none shadow-2xl transition-colors"
                 autoFocus
               />
@@ -170,20 +230,6 @@ export default function Navbar() {
                 <X className="w-5 h-5" />
               </button>
             </form>
-            <div className="mt-8">
-              <p className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Popular Searches</p>
-              <div className="flex flex-wrap gap-2">
-                {["Leather Tote", "Oxford Shirt", "Cashmere", "Accessories"].map(term => (
-                  <button 
-                    key={term}
-                    onClick={() => { setSearchQuery(term); handleSearch(new Event('submit') as any); }}
-                    className="px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-full text-sm font-medium transition-colors"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       )}

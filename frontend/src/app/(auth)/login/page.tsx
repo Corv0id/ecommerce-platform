@@ -21,13 +21,13 @@ export default function LoginPage() {
 
     try {
       // 1. Fetch Tokens
-      const tokenRes = await api.post("/auth/token/", { email, password });
+      const tokenRes = await api.post("/accounts/token/", { email, password });
       const { access } = tokenRes.data;
 
       // 2. Fetch User Profile
       // The API interceptor is not yet guaranteed to have the token for THIS next call 
       // if we rely on Zustand state updates to propagate, so we pass it explicitly:
-      const userRes = await api.get("/auth/me/", {
+      const userRes = await api.get("/accounts/me/", {
         headers: { Authorization: `Bearer ${access}` }
       });
       

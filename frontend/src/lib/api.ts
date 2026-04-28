@@ -27,6 +27,11 @@ api.interceptors.response.use(
   (error) => {
     // Global error handler
     console.error("API Error:", error.response?.data || error.message);
+    
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+    }
+    
     return Promise.reject(error);
   }
 );
@@ -43,4 +48,13 @@ export const accountApi = {
   getWishlist: () => api.get("/accounts/wishlist/"),
   addToWishlist: (productId: string) => api.post("/accounts/wishlist/", { product: productId }),
   removeFromWishlist: (id: string) => api.delete(`/accounts/wishlist/${id}/`),
+};
+
+export const orderApi = {
+  getOrders: () => api.get("/orders/"),
+  getOrder: (id: string) => api.get(`/orders/${id}/`),
+};
+
+export const catalogApi = {
+  getCategories: () => api.get("/catalog/categories/"),
 };

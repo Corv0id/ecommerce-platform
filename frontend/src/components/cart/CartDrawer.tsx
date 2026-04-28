@@ -5,6 +5,8 @@ import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { formatCurrency } from "@/lib/utils";
+
 export default function CartDrawer() {
   const { isOpen, items, toggleCart, updateQuantity, removeItem, getTotals } = useCartStore();
   const [mounted, setMounted] = useState(false);
@@ -67,7 +69,7 @@ export default function CartDrawer() {
                       <h3 className="font-medium line-clamp-1">{item.name}</h3>
                       {item.size && <p className="text-sm text-muted-foreground">Size: {item.size}</p>}
                     </div>
-                    <p className="font-semibold">{(item.price * item.quantity).toFixed(2)} TND</p>
+                    <p className="font-semibold">{formatCurrency(item.price * item.quantity)}</p>
                   </div>
                   
                   <div className="flex items-center justify-between mt-auto pt-2">
@@ -104,7 +106,7 @@ export default function CartDrawer() {
           <div className="p-6 border-t border-border bg-secondary/30">
             <div className="flex justify-between items-center mb-4 text-lg">
               <span className="font-medium">Subtotal</span>
-              <span className="font-bold">{subtotal.toFixed(2)} TND</span>
+              <span className="font-bold">{formatCurrency(subtotal)}</span>
             </div>
             <p className="text-sm text-muted-foreground mb-6">Shipping and taxes calculated at checkout.</p>
             <Link 

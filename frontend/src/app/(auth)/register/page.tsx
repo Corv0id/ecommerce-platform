@@ -29,7 +29,7 @@ export default function RegisterPage() {
 
     try {
       // Register returns { user: {...}, access: "...", refresh: "..." }
-      const res = await api.post("/auth/register/", formData);
+      const res = await api.post("/accounts/register/", formData);
       const { access, user } = res.data;
 
       // Save to Zustand
