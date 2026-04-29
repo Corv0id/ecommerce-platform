@@ -17,7 +17,7 @@ async function getProducts(searchQuery: string | null = null, categoryQuery: str
     }
     
     const res = await fetch(url.toString(), { 
-      next: { revalidate: 60 } // Revalidate every minute
+      cache: 'no-store' // Disable caching to ensure filters apply immediately
     });
     if (!res.ok) throw new Error("Failed to fetch products");
     const data = await res.json();
