@@ -160,13 +160,7 @@ def run():
             "imgs": ["https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&q=80"]
         },
         # Women - Handbags
-        {
-            "cat": women_sacs,
-            "name": "Full Grain Leather Tote Bag",
-            "desc": "Designed to accompany your everyday life with sophistication. This large tote bag can hold a 15-inch laptop and all your essentials. Suede-lined interior with a detachable zippered pouch.",
-            "price": 450.000,
-            "imgs": ["https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=800&q=80"]
-        },
+       
         {
             "cat": women_sacs,
             "name": "Quilted Leather Crossbody Bag",
