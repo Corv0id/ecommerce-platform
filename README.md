@@ -86,7 +86,38 @@ python manage.py runserver
 cd frontend
 npm install
 npm run dev
+### 4. Churn Analysis (Data Science)
+To run the customer churn prediction analysis:
+```bash
+pip install -r analysis_requirements.txt
+python churn_analysis.py
 ```
+
+---
+
+## 📊 Customer Churn Analysis & Prediction
+
+As part of our commitment to data-driven growth, we implemented a comprehensive **Customer Churn Analysis** to identify patterns and predict user retention.
+
+### 🔍 Key Findings
+- **Retention vs Churn**: 82.2% (4,682 users) are retained, while 16.8% (948 users) have churned.
+- **App Engagement**: Most customers spend **2-4 hours** on the app but typically order only **1-2 times**.
+- **Churn Indicators**: 
+  - Customers who **complain** in their last month are significantly more likely to churn.
+  - **Marital Status**: Single customers show a higher churn rate.
+  - **Post-Purchase Fatigue**: A high number of churns occur after the 1st or 2nd order, specifically within a week of the last order.
+- **Logistics**: Surprisingly, the distance from the warehouse to the customer's home has **weak or no correlation** with churn (0.07 correlation).
+
+### 🤖 Machine Learning Models
+We evaluated three models to predict churn, achieving high accuracy across the board:
+
+| Model | Accuracy | Precision (Churn) | Recall (Churn) |
+| :--- | :--- | :--- | :--- |
+| **Logistic Regression** | 79% | 0.80 | 0.80 |
+| **K-Nearest Neighbor (KNN)** | 79% | 0.80 | 0.80 |
+| **Support Vector Machine (SVM)** | 76% | 0.75 | 0.82 |
+
+> The models utilize **oversampling** (SMOTE-like approach) to handle the class imbalance between retained and churned users.
 
 ---
 
