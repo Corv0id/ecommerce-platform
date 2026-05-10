@@ -28,3 +28,45 @@ A core differentiator of the Luxe platform is its integrated Data Science pipeli
 ## Core Platform Features
 - Role-Based Access Control (RBAC): Strict segregation of data and UI via the PortalGuard interceptor on the frontend and custom permission classes on the backend.
 - High-Performance UI: Server-Side Rendering (SSR) via Next.js ensures fast Initial Page Loads and excellent SEO
+- Intelligent Catalog Management: Dynamic variants, inventory tracking, and categorical relationships natively supported by the ORM.
+- Stateless Authentication: Highly secure JWT-based sessions with silent token refresh handling.
+## Methodology (Agile Scrum)
+The project followed a strict Scrum methodology across 8 execution Sprints:
+1. Sprint 1-2: Architecture framing and Headless ecosystem setup.
+2. Sprint 3-4: Development of Core Features (Authentication, RBAC & Catalog mapping).
+3. Sprint 5: Data Science integration, Machine Learning models and Analytics Pipeline.
+4. Sprint 6-7: UX/UI refinement, Quality Assurance (QA), and Client state management.
+5. Sprint 8: Localization (TND currency), Database seeding, and Final deployment preparation.
+## Installation & Local Setup
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Redis (Required for Celery task processing)
+### Backend Setup
+1. Navigate to the backend directory:
+   `cd backend`
+2. Create a virtual environment:
+   `python -m venv venv`
+3. Activate the virtual environment:
+   `source venv/bin/activate` (or `venv\Scripts\activate` on Windows)
+4. Install dependencies:
+   `pip install -r requirements.txt`
+5. Apply migrations:
+   `python manage.py migrate`
+6. Run the server:
+   `python manage.py runserver`
+### Frontend Setup
+1. Navigate to the frontend directory:
+   `cd frontend`
+2. Install dependencies:
+   `npm install`
+3. Start the development server:
+   `npm run dev`
+The application will be accessible at http://localhost:3000.
+---
+## Authors
+- Ranim Rtimi
+- Nour Elhouda Louhichi
+- Mohamed Ali Adouni
+---
+*L U X E - Designed for the future of digital retail.*
