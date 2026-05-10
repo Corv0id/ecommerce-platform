@@ -1,12 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from apps.accounts.api.views import LoginView, MeView, RefreshView, RegisterView, AddressViewSet, WishlistViewSet
+from apps.accounts.api.views import LoginView, MeView, RefreshView, RegisterView, AddressViewSet, WishlistViewSet, AdminUserViewSet
 
 app_name = "accounts"
 
 router = DefaultRouter()
 router.register(r'addresses', AddressViewSet, basename='address')
 router.register(r'wishlist', WishlistViewSet, basename='wishlist')
+router.register(r'users', AdminUserViewSet, basename='admin-users')
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),

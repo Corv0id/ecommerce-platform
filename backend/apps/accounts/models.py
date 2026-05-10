@@ -73,3 +73,17 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.line1}, {self.city} - {self.user.email}"
+
+class StoreSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="store_settings")
+    store_name = models.CharField(max_length=255, blank=True)
+    contact_email = models.EmailField(blank=True)
+    currency = models.CharField(max_length=10, default="TND")
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    order_notifications = models.BooleanField(default=True)
+    maintenance_mode = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Settings for {self.store_name or self.user.email}"
+

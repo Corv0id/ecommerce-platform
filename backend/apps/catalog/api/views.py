@@ -18,7 +18,13 @@ class ProductViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
     def get_queryset(self):
-        queryset = Product.objects.prefetch_related("variants__inventory", "images").select_related("category").filter(status=Product.Status.PUBLISHED)
+        user = self.request.user
+        queryset = Product.objects.prefetch_related("variants__inventory", "images").select_related("category")
+        
+        # Customers only see PUBLISHED products. Merchants/Admins see all.
+        if not user.is_authenticated or user.role == "CUSTOMER":
+            queryset = queryset.filter(status=Product.Status.PUBLISHED)
+        
         category_slug = self.request.query_params.get('category', None)
         if category_slug and category_slug.lower() != 'all':
             try:

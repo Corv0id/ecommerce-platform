@@ -132,7 +132,7 @@ export default function Navbar() {
             </button>
             
             {isAuthenticated ? (
-              <Link href="/account" className="hidden md:flex text-muted-foreground hover:text-foreground transition-colors p-2" aria-label="Account">
+              <Link href="/portal" className="hidden md:flex text-muted-foreground hover:text-foreground transition-colors p-2" aria-label="Account">
                 <User className="w-5 h-5" />
               </Link>
             ) : (
@@ -199,7 +199,7 @@ export default function Navbar() {
               </Link>
             </nav>
             <div className="p-6 border-t border-border bg-secondary/30">
-              <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-lg font-medium">
+              <Link href="/portal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 text-lg font-medium">
                 <User className="w-5 h-5" /> My Account
               </Link>
             </div>

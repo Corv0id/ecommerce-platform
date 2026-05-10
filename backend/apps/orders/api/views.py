@@ -77,5 +77,8 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user).prefetch_related('lines__variant__product')
+        user = self.request.user
+        if user.role in ["ADMIN", "MERCHANT"]:
+            return Order.objects.all().prefetch_related('lines__variant__product')
+        return Order.objects.filter(user=user).prefetch_related('lines__variant__product')
 

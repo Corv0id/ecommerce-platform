@@ -26,12 +26,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Global error handler
-    console.error("API Error:", error.response?.data || error.message);
-    
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
+      // Silently reject for 401 to avoid console clutter
+      return Promise.reject(error);
     }
     
+    console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -48,13 +49,20 @@ export const accountApi = {
   getWishlist: () => api.get("/accounts/wishlist/"),
   addToWishlist: (productId: string) => api.post("/accounts/wishlist/", { product: productId }),
   removeFromWishlist: (id: string) => api.delete(`/accounts/wishlist/${id}/`),
+
+  getAdminCustomers: () => api.get("/accounts/users/"),
 };
 
 export const orderApi = {
   getOrders: () => api.get("/orders/"),
   getOrder: (id: string) => api.get(`/orders/${id}/`),
+  getAdminOrders: () => api.get("/orders/"),
 };
 
 export const catalogApi = {
   getCategories: () => api.get("/catalog/categories/"),
+};
+
+export const analyticsApi = {
+  getChurnStats: () => api.get("/analytics/churn-stats/"),
 };

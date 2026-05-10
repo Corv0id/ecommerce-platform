@@ -68,3 +68,16 @@ class WishlistViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+class AdminUserViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ["ADMIN", "MERCHANT"]:
+            return User.objects.all().order_by('-date_joined')
+        return User.objects.none()

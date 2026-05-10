@@ -36,8 +36,13 @@ export default function LoginPage() {
       // 3. Save to Zustand
       login(access, user);
 
-      // 4. Redirect
-      router.push("/account");
+      // 4. Intelligent Redirection
+      const redirectPath = 
+        user.role === "ADMIN" ? "/portal/admin" : 
+        user.role === "MERCHANT" ? "/portal/merchant" : 
+        "/portal/customer";
+
+      router.push(redirectPath);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Invalid email or password.");
     } finally {

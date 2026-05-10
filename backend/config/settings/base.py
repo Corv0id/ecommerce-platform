@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.payments",
     "apps.recommendations",
     "apps.analytics",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
